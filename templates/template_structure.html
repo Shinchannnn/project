@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Template Structure</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #ffffff, #e3f2fd);
+        }
+        .container {
+            width: 90%;
+            margin: 50px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #0288d1;
+            color: white;
+            font-size: 18px;
+        }
+        td {
+            background-color: #f9f9f9;
+            font-size: 16px;
+        }
+        .view-button {
+            padding: 8px 15px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .view-button:hover {
+            background-color: #388e3c;
+        }
+        .up-button, .down-button {
+            border: none;
+            background-color: transparent;
+            cursor: pointer;
+        }
+        .up-button::before, .down-button::before {
+            content: '\25B2'; /* Unicode for triangle */
+            font-size: 18px;
+        }
+        .down-button::before {
+            content: '\25BC'; /* Unicode for downward triangle */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 style="text-align: center;">Template Structure</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Template Name</th>
+                    <th>Template J</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Template 1</td>
+                    <td>
+                        <button class="view-button">View</button>
+                        <div style="margin-top: 10px;">Details</div>
+                    </td>
+                    <td>
+                        <button class="up-button"></button>
+                        <button class="down-button"></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Template 2</td>
+                    <td>
+                        <button class="view-button">View</button>
+                        <div style="margin-top: 10px;">Details</div>
+                    </td>
+                    <td>
+                        <button class="up-button"></button>
+                        <button class="down-button"></button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const templates = JSON.parse(localStorage.getItem('templates')) || [];
+            const tableBody = document.querySelector('tbody');
+        
+            function renderTemplates() {
+                tableBody.innerHTML = '';
+                if (templates.length === 0) {
+                    tableBody.innerHTML = '<tr><td colspan="3">No templates available</td></tr>';
+                } else {
+                    templates.forEach((template, index) => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
+                            <td>${template.name}</td>
+                            <td>
+                                <button class="view-button" onclick="viewTemplate(${index})">View</button>
+                            </td>
+                            <td>
+                                <button class="delete-btn" onclick="deleteTemplate(${index})">Delete</button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    });
+                }
+            }
+        
+            function viewTemplate(index) {
+                const template = templates[index];
+                if (template) {
+                    alert(`Template Name: ${template.name}\nSelected Key: ${template.data.key}\nSelected Value: ${template.data.value}`);
+                }
+            }
+        
+            function deleteTemplate(index) {
+                if (confirm('Are you sure you want to delete this template?')) {
+                    templates.splice(index, 1);
+                    localStorage.setItem('templates', JSON.stringify(templates));
+                    renderTemplates();
+                }
+            }
+        
+            renderTemplates();
+        });
+        </script>
+        
+</body>
+</html>

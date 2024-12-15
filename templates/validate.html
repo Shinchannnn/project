@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Validation Table</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to bottom right, #ffffff, #d7e8f7);
+        }
+        .container {
+            width: 80%;
+            margin: 50px auto;
+            text-align: center;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: #fff;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+        }
+        td {
+            background-color: #f9f9f9;
+        }
+        .delete-btn {
+            padding: 5px 10px;
+            background-color: #ff4d4d;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .delete-btn:hover {
+            background-color: #e60000;
+        }
+        .save-btn {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .save-btn:hover {
+            background-color: #0056b3;
+        }
+        .confirm-btn {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 10px 20px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .confirm-btn:hover {
+            background-color: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Validation Table</h1>
+        <table>
+            <thead>
+                <tr>
+                    <th>Step</th>
+                    <th>Argument</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody id="table-body">
+                <tr>
+                    <td colspan="3">No key-value pair selected</td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="save-btn" onclick="saveConfiguration()">Save Configuration</button>
+        <button class="confirm-btn" onclick="redirectToNewPage()">Confirm</button>
+    </div>
+    <script>
+        // Retrieve existing validated pairs from sessionStorage
+        const validatedPairs = JSON.parse(sessionStorage.getItem('validatedPairs')) || [];
+        const tableBody = document.getElementById('table-body');
+
+        // Function to render the table rows
+        function renderTable() {
+            tableBody.innerHTML = ''; // Clear existing rows
+            if (validatedPairs.length > 0) {
+                validatedPairs.forEach((pair, index) => {
+                    const newRow = document.createElement('tr');
+                    newRow.id = `row-${index + 1}`;
+                    newRow.innerHTML = `
+                        <td>${index + 1}</td>
+                        <td>${pair.key} : ${pair.value}</td>
+                        <td>
+                            <button class="delete-btn" onclick="confirmDelete(${index})">Delete</button>
+                        </td>
+                    `;
+                    tableBody.appendChild(newRow);
+                });
+            } else {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="3">No key-value pair selected</td>
+                    </tr>
+                `;
+            }
+        }
+
+        // Add a new row if data is passed via POST
+        const urlParams = new URLSearchParams(window.location.search);
+        const key = urlParams.get('key');
+        const value = urlParams.get('value');
+        if (key && value) {
+            validatedPairs.push({ key, value });
+            sessionStorage.setItem('validatedPairs', JSON.stringify(validatedPairs));
+
+            // Remove key and value from URL
+            const newUrl = window.location.origin + window.location.pathname;
+            history.replaceState({}, document.title, newUrl);
+        }
+
+        // Render the table
+        renderTable();
+
+        // Function to delete a row with double confirmation
+        function confirmDelete(index) {
+            if (confirm("Are you sure you want to delete this item?")) {
+                if (confirm("This action is irreversible. Do you really want to proceed?")) {
+                    validatedPairs.splice(index, 1);
+                    sessionStorage.setItem('validatedPairs', JSON.stringify(validatedPairs));
+                    renderTable();
+                    alert("Item deleted successfully!");
+                } else {
+                    alert("Action canceled.");
+                }
+            } else {
+                alert("Action canceled.");
+            }
+        }
+
+        // Function to save configuration and redirect to the referring page
+        function saveConfiguration() {
+            // Save any necessary configuration here (already stored in sessionStorage)
+
+            // Get the referring page (the previous page URL)
+            const referrer = document.referrer;
+
+            // Check if the referrer is valid and redirect
+            if (referrer) {
+                window.location.href = referrer;
+            } else {
+                // Fallback: Redirect to a default page if no referrer is available
+                alert("No referrer found. Redirecting to home.");
+                window.location.href = '/'; // Update this to your desired fallback page
+            }
+        }
+
+        function redirectToNewPage() {
+        window.location.href = 'http://127.0.0.1:5000/template_structure'; // Redirect to the specified URL
+}
+
+    </script>
+</body>
+</html>
